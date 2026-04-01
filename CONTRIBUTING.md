@@ -18,7 +18,7 @@
 Run:
 
 ```bash
-pytest plugins/kimi-code-ui/tests -q
+python3 -m pytest plugins/kimi-code-ui/tests -q
 ```
 
 If you change the adapter CLI or output contract, update:

@@ -34,10 +34,10 @@ Do not use this skill until you know the editable files. If they are unclear, in
 1. Confirm the task is frontend/UI focused.
 2. Identify the exact editable files.
 3. Collect any read-only context files and constraints that Kimi needs.
-4. Run the adapter:
+4. Run the adapter from the installed plugin location. Resolve the script path relative to this skill file or the plugin root; do not assume the current working directory is the plugin repository.
 
 ```bash
-python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
+python3 /absolute/path/to/kimi-code-ui/scripts/run_kimi_ui_task.py \
   --cwd /path/to/repo \
   --task "Refine the dashboard table layout for mobile" \
   --target-file src/pages/dashboard.tsx \
@@ -48,6 +48,8 @@ python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
   --verify-cmd "pnpm lint" \
   --json
 ```
+
+In this plugin layout, the adapter script lives at `scripts/run_kimi_ui_task.py` under the plugin root.
 
 5. Read the adapter result rather than relying on raw `kimi` output.
 6. If `status` is `partial`, `retryable_error`, or `failed`, stop immediately.

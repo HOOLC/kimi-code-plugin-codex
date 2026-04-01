@@ -30,13 +30,15 @@ plugins/kimi-code-ui/
    - optional read-only context files
    - optional constraints
    - repo facts inferred from the working directory
-4. The adapter sends a fixed prompt to `kimi --quiet`.
+4. The adapter sends a fixed prompt to `kimi` and consumes structured `stream-json` output.
 5. After Kimi returns, the adapter:
    - compares target files before and after the run
    - optionally runs verification commands
    - emits either a text summary or stable JSON
 
 ## Quick Start
+
+The example below assumes your current directory is this repository root. When the plugin is installed in Codex, Codex resolves the installed plugin path for you through the skill.
 
 ```bash
 python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
@@ -61,7 +63,7 @@ Prerequisites:
 Run tests:
 
 ```bash
-pytest plugins/kimi-code-ui/tests -q
+python3 -m pytest plugins/kimi-code-ui/tests -q
 ```
 
 The plugin-specific workflow and adapter details live in `plugins/kimi-code-ui/README.md`.

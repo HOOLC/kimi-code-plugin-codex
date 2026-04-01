@@ -6,7 +6,7 @@ This plugin adds a single Codex skill that routes bounded frontend and UI work t
 
 - accepts a task plus an explicit list of editable files
 - reads optional context files and repo facts
-- builds a stable prompt for `kimi --quiet`
+- builds a stable prompt for `kimi` and consumes structured `stream-json` output
 - tracks changes only for the declared editable files
 - can append structured JSONL progress events to an optional progress file
 - optionally runs verification commands
@@ -21,8 +21,10 @@ This plugin adds a single Codex skill that routes bounded frontend and UI work t
 
 ## Quick Start
 
+The example below assumes your current directory is this plugin root. If Codex invokes the skill for you, it should resolve the installed plugin path automatically.
+
 ```bash
-python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
+python3 scripts/run_kimi_ui_task.py \
   --cwd /path/to/repo \
   --task "Tighten the hero layout and improve mobile spacing" \
   --target-file src/App.tsx \
