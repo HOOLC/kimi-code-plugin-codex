@@ -52,6 +52,37 @@ python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
   --json
 ```
 
+## Install In Codex
+
+The steps below install the plugin into a local Codex setup that uses `~/.codex` as `CODEX_HOME`.
+
+1. Clone this repository anywhere on your machine.
+2. Copy the plugin bundle into the Codex plugin cache:
+
+```bash
+CODEX_HOME="${CODEX_HOME:-$HOME/.codex}"
+REPO_DIR="/path/to/kimi-code-plugin-codex"
+
+mkdir -p "$CODEX_HOME/plugins/cache/kimi-code-plugin-codex/kimi-code-ui/local"
+rsync -a --delete \
+  "$REPO_DIR/plugins/kimi-code-ui/" \
+  "$CODEX_HOME/plugins/cache/kimi-code-plugin-codex/kimi-code-ui/local/"
+```
+
+3. Enable the plugin in `$CODEX_HOME/config.toml`:
+
+```toml
+[plugins."kimi-code-ui@kimi-code-plugin-codex"]
+enabled = true
+```
+
+4. Restart Codex so it reloads the plugin list.
+
+Notes:
+
+- The plugin requires the local `kimi` CLI to be installed and available on `PATH`.
+- If you previously enabled the older plugin key `kimi-ui-workflow@kimi-code-plugin-codex`, replace it with `kimi-code-ui@kimi-code-plugin-codex`.
+
 ## Development
 
 Prerequisites:
