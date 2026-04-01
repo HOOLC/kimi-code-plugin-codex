@@ -6,7 +6,7 @@ Use this repository when you want Codex to hand off bounded frontend and UI work
 
 - a Codex plugin at `plugins/kimi-code-ui/`
 - a `kimi-ui-task` skill for bounded frontend and UI work
-- a Python adapter that invokes `kimi`, tracks allowed file changes, and can run verification commands
+- bounded execution through the local `kimi` CLI with explicit editable files
 - structured output that Codex can inspect instead of relying on raw CLI text
 
 ## Requirements
@@ -85,22 +85,6 @@ Typical fit:
 - bounded UI polish inside a known file list
 - tasks where you want optional `lint` or `test` verification after the edit
 
-## Run The Adapter Manually
-
-The example below assumes your current directory is this repository root.
-
-```bash
-python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
-  --cwd /path/to/repo \
-  --task "Tighten the hero layout and improve mobile spacing" \
-  --target-file src/App.tsx \
-  --target-file src/components/Hero.tsx \
-  --context-file src/styles.css \
-  --constraint "Keep the existing color palette and typography" \
-  --verify-cmd "pnpm lint" \
-  --json
-```
-
 ## How It Works
 
 1. Codex identifies a frontend or UI task with explicit editable files.
@@ -108,27 +92,6 @@ python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
 3. The adapter collects the task, editable files, optional read-only context, optional constraints, and repo facts from `--cwd`.
 4. The adapter sends a fixed prompt to `kimi` and consumes structured `stream-json` output.
 5. After Kimi returns, the adapter reports changed files, verification results, and a stable final status.
-
-## Repository Layout
-
-```text
-plugins/kimi-code-ui/
-├── .codex-plugin/plugin.json
-├── README.md
-├── scripts/run_kimi_ui_task.py
-├── skills/kimi-ui-task/SKILL.md
-└── tests/test_run_kimi_ui_task.py
-```
-
-## Development
-
-Run tests:
-
-```bash
-python3 -m pytest plugins/kimi-code-ui/tests -q
-```
-
-Plugin-specific workflow details live in `plugins/kimi-code-ui/README.md`.
 
 ## License
 
