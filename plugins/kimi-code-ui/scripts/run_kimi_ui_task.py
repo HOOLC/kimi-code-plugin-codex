@@ -81,6 +81,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="Extra design or implementation constraint. Repeatable.",
     )
     parser.add_argument(
+        "--reference-image",
+        action="append",
+        dest="reference_images",
+        default=[],
+        help="Reference image path for Kimi to inspect directly. Repeatable.",
+    )
+    parser.add_argument(
         "--verify-cmd",
         action="append",
         default=[],
@@ -152,6 +159,13 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
 
     target_paths = dedupe_paths(args.target_files, cwd, allow_missing=True)
     context_paths = dedupe_paths(args.context_files, cwd, allow_missing=False)
+    reference_image_paths = dedupe_paths(
+        args.reference_images,
+        cwd,
+        allow_missing=False,
+        enforce_within_cwd=False,
+        missing_label="Reference image",
+    )
     progress_path = resolve_progress_path(args.progress_file, cwd)
     progress_writer = ProgressWriter(progress_path)
 
@@ -162,6 +176,7 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
             "cwd": str(cwd),
             "target_files": [str(path) for path in target_paths],
             "context_files": [str(path) for path in context_paths],
+            "reference_images": [str(path) for path in reference_image_paths],
         },
     )
 
@@ -173,6 +188,7 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         cwd=cwd,
         target_paths=target_paths,
         context_paths=context_paths,
+        reference_image_paths=reference_image_paths,
         constraints=args.constraint,
         repo_facts=repo_facts,
     )
@@ -248,6 +264,7 @@ def execute(args: argparse.Namespace) -> dict[str, object]:
         "cwd": str(cwd),
         "target_files": [str(path) for path in target_paths],
         "context_files": [str(path) for path in context_paths],
+        "reference_images": [str(path) for path in reference_image_paths],
         "changed_files": changed_files,
         "unchanged_target_files": unchanged_target_files,
         "file_results": file_results,
@@ -270,6 +287,7 @@ def failure_payload(
         "cwd": str(cwd),
         "target_files": [],
         "context_files": [],
+        "reference_images": [],
         "changed_files": [],
         "unchanged_target_files": [],
         "file_results": [],
@@ -318,16 +336,24 @@ def emit_file_events(
             progress_writer.emit("file_modified", {"path": path})
 
 
-def dedupe_paths(raw_paths: Sequence[str], cwd: Path, allow_missing: bool) -> list[Path]:
+def dedupe_paths(
+    raw_paths: Sequence[str],
+    cwd: Path,
+    allow_missing: bool,
+    *,
+    enforce_within_cwd: bool = True,
+    missing_label: str = "Context file",
+) -> list[Path]:
     resolved: list[Path] = []
     seen: set[Path] = set()
     for raw in raw_paths:
         path = resolve_path(raw, cwd)
         if path in seen:
             continue
-        ensure_within_cwd(path, cwd)
+        if enforce_within_cwd:
+            ensure_within_cwd(path, cwd)
         if not allow_missing and not path.exists():
-            raise FileNotFoundError(f"Context file does not exist: {path}")
+            raise FileNotFoundError(f"{missing_label} does not exist: {path}")
         seen.add(path)
         resolved.append(path)
     return resolved
@@ -437,6 +463,7 @@ def build_prompt(
     cwd: Path,
     target_paths: Sequence[Path],
     context_paths: Sequence[Path],
+    reference_image_paths: Sequence[Path] = (),
     constraints: Sequence[str],
     repo_facts: Sequence[str],
 ) -> str:
@@ -453,12 +480,28 @@ def build_prompt(
     all_constraints = [*base_constraints, *constraints]
     editable_intro = format_path_list(target_paths, cwd)
     readonly_intro = format_path_list(context_paths, cwd) if context_paths else "- None"
+    reference_intro = (
+        format_path_list(reference_image_paths, cwd) if reference_image_paths else "- None"
+    )
     target_blocks = render_file_blocks(target_paths, cwd, allow_missing=True)
     context_blocks = render_file_blocks(context_paths, cwd, allow_missing=False) or "No context files were provided."
 
     sections = [
         ("Role", "You are Kimi acting as a frontend and UI specialist inside an existing local repository."),
         ("Task", task.strip()),
+        (
+            "Reference Images",
+            "\n".join(
+                [
+                    "These local image files are part of the task input:",
+                    reference_intro,
+                    "",
+                    "Inspect these image files directly before editing.",
+                    "Use local file or media-reading tools if needed.",
+                    "Treat the image files themselves as the visual source of truth instead of relying on rewritten textual substitutes.",
+                ]
+            ),
+        ),
         ("Success Criteria", bullet_block(success_criteria)),
         (
             "Editable Files",
@@ -783,6 +826,13 @@ def render_text_summary(payload: dict[str, object]) -> str:
         lines.extend(f"- {path}" for path in changed_files)
     else:
         lines.append("changed_files: none")
+
+    reference_images = payload.get("reference_images", [])
+    if reference_images:
+        lines.append("reference_images:")
+        lines.extend(f"- {path}" for path in reference_images)
+    else:
+        lines.append("reference_images: none")
 
     if verification:
         lines.append("verification:")

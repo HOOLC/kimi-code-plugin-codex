@@ -23,18 +23,22 @@ def test_build_prompt_contains_sections_and_truncation(tmp_path: Path) -> None:
     target.write_text("A" * (module.MAX_FILE_CHARS + 10), encoding="utf-8")
     context = cwd / "src" / "styles.css"
     context.write_text("body { color: black; }", encoding="utf-8")
+    reference_image = tmp_path.parent / "mockup.png"
+    reference_image.write_bytes(b"\x89PNG\r\n\x1a\n")
 
     prompt = module.build_prompt(
         task="Tighten spacing in the hero",
         cwd=cwd,
         target_paths=[target],
         context_paths=[context],
+        reference_image_paths=[reference_image],
         constraints=["Keep existing tokens"],
         repo_facts=["package.json present"],
     )
 
     assert "Role" in prompt
     assert "Task" in prompt
+    assert "Reference Images" in prompt
     assert "Success Criteria" in prompt
     assert "Editable Files" in prompt
     assert "Read-only Context" in prompt
@@ -45,6 +49,8 @@ def test_build_prompt_contains_sections_and_truncation(tmp_path: Path) -> None:
     assert "src/App.tsx" in prompt
     assert "(Truncated to " in prompt
     assert "Keep existing tokens" in prompt
+    assert str(reference_image) in prompt
+    assert "Use local file or media-reading tools if needed." in prompt
 
 
 def test_collect_file_results_tracks_modified_created_unchanged_missing(tmp_path: Path) -> None:
@@ -93,6 +99,7 @@ def test_build_kimi_command_uses_print_stream_json(tmp_path: Path) -> None:
     assert command[:4] == ["kimi", "--print", "--output-format", "stream-json"]
     assert "-w" in command
     assert "--quiet" not in command
+    assert "--input-format" not in command
     assert command[-5:] == ["-m", "kimi-test", "--no-thinking", "--max-steps-per-turn", "12"]
 
 
@@ -152,11 +159,15 @@ def test_execute_success_runs_verification_and_tracks_changes(tmp_path: Path, mo
     target.write_text("before", encoding="utf-8")
     context = tmp_path / "src" / "tokens.css"
     context.write_text(":root {}", encoding="utf-8")
+    reference_image = tmp_path.parent / "mockup.png"
+    reference_image.write_bytes(b"\x89PNG\r\n\x1a\n")
 
     monkeypatch.setattr(module, "which", lambda _: "/usr/bin/kimi")
 
     def fake_run_kimi_with_retry(**kwargs):
         target.write_text("after", encoding="utf-8")
+        assert str(reference_image.resolve()) in kwargs["prompt"]
+        assert "Use local file or media-reading tools if needed." in kwargs["prompt"]
         return {"exit_code": 0, "stdout": "Outcome:\nDone", "stderr": ""}
 
     def fake_run_verification_commands(commands, cwd):
@@ -173,6 +184,7 @@ def test_execute_success_runs_verification_and_tracks_changes(tmp_path: Path, mo
         target_files=["src/App.tsx"],
         context_files=["src/tokens.css"],
         constraint=["Keep existing spacing scale"],
+        reference_images=[str(reference_image)],
         verify_cmd=["pnpm lint"],
         cwd=str(tmp_path),
         model="",
@@ -186,6 +198,7 @@ def test_execute_success_runs_verification_and_tracks_changes(tmp_path: Path, mo
 
     assert payload["status"] == "success"
     assert payload["changed_files"] == [str(target)]
+    assert payload["reference_images"] == [str(reference_image.resolve())]
     assert payload["verification"][0]["exit_code"] == 0
     assert "Outcome:" in payload["final_message"]
     progress_events = [
@@ -223,6 +236,7 @@ def test_execute_returns_no_change_without_verification(tmp_path: Path, monkeypa
         target_files=["src/App.tsx"],
         context_files=[],
         constraint=[],
+        reference_images=[],
         verify_cmd=["pnpm lint"],
         cwd=str(tmp_path),
         model="",
@@ -251,6 +265,7 @@ def test_execute_maps_retryable_and_failed_exit_codes(tmp_path: Path, monkeypatc
         target_files=["src/App.tsx"],
         context_files=[],
         constraint=[],
+        reference_images=[],
         verify_cmd=[],
         cwd=str(tmp_path),
         model="",
@@ -291,6 +306,7 @@ def test_context_file_must_exist(tmp_path: Path, monkeypatch) -> None:
         target_files=["src/App.tsx"],
         context_files=["src/missing.css"],
         constraint=[],
+        reference_images=[],
         verify_cmd=[],
         cwd=str(tmp_path),
         model="",
@@ -304,5 +320,35 @@ def test_context_file_must_exist(tmp_path: Path, monkeypatch) -> None:
         module.execute(args)
     except FileNotFoundError as exc:
         assert "Context file does not exist" in str(exc)
+    else:  # pragma: no cover - explicit failure branch
+        raise AssertionError("expected FileNotFoundError")
+
+
+def test_reference_image_must_exist(tmp_path: Path, monkeypatch) -> None:
+    target = tmp_path / "src" / "App.tsx"
+    target.parent.mkdir(parents=True)
+    target.write_text("before", encoding="utf-8")
+
+    monkeypatch.setattr(module, "which", lambda _: "/usr/bin/kimi")
+
+    args = argparse.Namespace(
+        task="Match the screenshot",
+        target_files=["src/App.tsx"],
+        context_files=[],
+        constraint=[],
+        reference_images=["/tmp/missing-mockup.png"],
+        verify_cmd=[],
+        cwd=str(tmp_path),
+        model="",
+        thinking=None,
+        max_steps_per_turn=None,
+        progress_file="",
+        json=True,
+    )
+
+    try:
+        module.execute(args)
+    except FileNotFoundError as exc:
+        assert "Reference image does not exist" in str(exc)
     else:  # pragma: no cover - explicit failure branch
         raise AssertionError("expected FileNotFoundError")
