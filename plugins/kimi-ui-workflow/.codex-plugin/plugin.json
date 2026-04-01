@@ -1,0 +1,41 @@
+{
+  "name": "kimi-ui-workflow",
+  "version": "0.1.0",
+  "description": "Run bounded frontend and UI tasks through kimi-cli and return structured results.",
+  "author": {
+    "name": "Local Workspace",
+    "email": "noreply@example.com",
+    "url": "https://example.com/kimi-ui-workflow"
+  },
+  "homepage": "https://example.com/kimi-ui-workflow",
+  "repository": "https://example.com/kimi-ui-workflow",
+  "license": "MIT",
+  "keywords": [
+    "kimi",
+    "frontend",
+    "ui",
+    "codex-plugin"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Kimi UI Workflow",
+    "shortDescription": "Route bounded frontend and UI edits through kimi-cli with structured results",
+    "longDescription": "Use Kimi UI Workflow to hand frontend and UI tasks to the local kimi CLI while limiting editable files, passing focused repo context, and returning stable JSON summaries for Codex to inspect.",
+    "developerName": "Local Workspace",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://example.com/kimi-ui-workflow",
+    "privacyPolicyURL": "https://example.com/privacy",
+    "termsOfServiceURL": "https://example.com/terms",
+    "defaultPrompt": [
+      "Use Kimi UI Workflow to refine the layout in these React files",
+      "Apply a focused frontend UI change only inside the listed files",
+      "Route this Tailwind interface update through kimi-cli and summarize the result"
+    ],
+    "brandColor": "#0F172A"
+  }
+}
