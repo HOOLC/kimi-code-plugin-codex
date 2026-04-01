@@ -1,4 +1,4 @@
-# Kimi UI Workflow Plugin
+# Kimi Code UI Plugin
 
 This plugin adds a single Codex skill that routes bounded frontend and UI work through the local `kimi` CLI.
 
@@ -22,7 +22,7 @@ This plugin adds a single Codex skill that routes bounded frontend and UI work t
 ## Quick Start
 
 ```bash
-python3 plugins/kimi-ui-workflow/scripts/run_kimi_ui_task.py \
+python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
   --cwd /path/to/repo \
   --task "Tighten the hero layout and improve mobile spacing" \
   --target-file src/App.tsx \

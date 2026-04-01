@@ -1,0 +1,45 @@
+{
+  "name": "kimi-code-ui",
+  "version": "0.1.0",
+  "description": "Run bounded frontend and UI tasks through kimi-cli and return structured results.",
+  "author": {
+    "name": "kingwl",
+    "email": "kingwenlu@gmail.com",
+    "url": "https://github.com/HOOLC"
+  },
+  "homepage": "https://github.com/HOOLC/kimi-code-plugin-codex",
+  "repository": "https://github.com/HOOLC/kimi-code-plugin-codex",
+  "license": "MIT",
+  "keywords": [
+    "kimi",
+    "frontend",
+    "ui",
+    "codex-plugin",
+    "plugin",
+    "automation"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Kimi Code UI",
+    "shortDescription": "Run bounded frontend and UI tasks through kimi-cli with auditable results",
+    "longDescription": "Use Kimi Code UI to route scoped frontend and UI changes through the local kimi CLI, constrain editable files, observe progress through JSONL events, and return a stable final result back to Codex.",
+    "developerName": "kingwl",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/HOOLC/kimi-code-plugin-codex",
+    "privacyPolicyURL": "https://github.com/HOOLC/kimi-code-plugin-codex/blob/main/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/HOOLC/kimi-code-plugin-codex/blob/main/TERMS.md",
+    "defaultPrompt": [
+      "Use Kimi Code UI to refine the layout in these React files",
+      "Apply a focused frontend UI change only inside the listed files",
+      "Route this Tailwind interface update through kimi-cli and summarize the result"
+    ],
+    "brandColor": "#0F172A",
+    "composerIcon": "./assets/kimi-logo.png",
+    "logo": "./assets/kimi-logo.png"
+  }
+}

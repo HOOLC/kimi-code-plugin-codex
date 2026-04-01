@@ -4,7 +4,7 @@ This repository hosts a local Codex plugin that routes bounded frontend and UI t
 
 ## What is in this repo
 
-- a repo-local Codex plugin at `plugins/kimi-ui-workflow/`
+- a repo-local Codex plugin at `plugins/kimi-code-ui/`
 - a skill that defines when the workflow should be used
 - a Python adapter that builds the prompt, invokes `kimi`, tracks target-file changes, and runs optional verification commands
 - pytest coverage for prompt assembly, change tracking, and result mapping
@@ -12,7 +12,7 @@ This repository hosts a local Codex plugin that routes bounded frontend and UI t
 ## Repository Layout
 
 ```text
-plugins/kimi-ui-workflow/
+plugins/kimi-code-ui/
 ├── .codex-plugin/plugin.json
 ├── README.md
 ├── scripts/run_kimi_ui_task.py
@@ -39,7 +39,7 @@ plugins/kimi-ui-workflow/
 ## Quick Start
 
 ```bash
-python3 plugins/kimi-ui-workflow/scripts/run_kimi_ui_task.py \
+python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
   --cwd /path/to/repo \
   --task "Tighten the hero layout and improve mobile spacing" \
   --target-file src/App.tsx \
@@ -61,10 +61,10 @@ Prerequisites:
 Run tests:
 
 ```bash
-pytest plugins/kimi-ui-workflow/tests -q
+pytest plugins/kimi-code-ui/tests -q
 ```
 
-The plugin-specific workflow and adapter details live in `plugins/kimi-ui-workflow/README.md`.
+The plugin-specific workflow and adapter details live in `plugins/kimi-code-ui/README.md`.
 
 ## License
 

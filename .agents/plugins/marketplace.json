@@ -5,10 +5,10 @@
   },
   "plugins": [
     {
-      "name": "kimi-ui-workflow",
+      "name": "kimi-code-ui",
       "source": {
         "source": "local",
-        "path": "./plugins/kimi-ui-workflow"
+        "path": "./plugins/kimi-code-ui"
       },
       "policy": {
         "installation": "AVAILABLE",

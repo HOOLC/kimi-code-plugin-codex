@@ -18,11 +18,11 @@
 Run:
 
 ```bash
-pytest plugins/kimi-ui-workflow/tests -q
+pytest plugins/kimi-code-ui/tests -q
 ```
 
 If you change the adapter CLI or output contract, update:
 
 - `README.md`
-- `plugins/kimi-ui-workflow/README.md`
-- `plugins/kimi-ui-workflow/skills/kimi-ui-task/SKILL.md`
+- `plugins/kimi-code-ui/README.md`
+- `plugins/kimi-code-ui/skills/kimi-ui-task/SKILL.md`

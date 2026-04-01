@@ -37,7 +37,7 @@ Do not use this skill until you know the editable files. If they are unclear, in
 4. Run the adapter:
 
 ```bash
-python3 plugins/kimi-ui-workflow/scripts/run_kimi_ui_task.py \
+python3 plugins/kimi-code-ui/scripts/run_kimi_ui_task.py \
   --cwd /path/to/repo \
   --task "Refine the dashboard table layout for mobile" \
   --target-file src/pages/dashboard.tsx \
